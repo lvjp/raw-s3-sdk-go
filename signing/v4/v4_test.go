@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/lvjp/raw-s3-sdk-go/session"
+	"github.com/lvjp/raw-s3-sdk-go/config"
 	"github.com/stretchr/testify/assert"
 )
 
-var creds = session.Credentials{
+var creds = config.Credentials{
 	AccessKey: "AKI" + "AIOSFODNN7EXAMPLE",
 	SecretKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 }
@@ -52,7 +52,7 @@ type testCase struct {
 func generateTestCases(t *testing.T) []testCase {
 	return []testCase{
 		{
-			name: "GET Object",
+			name: "GetObject",
 			request: newRequest(
 				t,
 				http.MethodGet,
@@ -68,7 +68,7 @@ func generateTestCases(t *testing.T) []testCase {
 		},
 
 		{
-			name: "PUT Object",
+			name: "PutObject",
 			request: newRequest(
 				t,
 				http.MethodPut,
@@ -85,7 +85,7 @@ func generateTestCases(t *testing.T) []testCase {
 		},
 
 		{
-			name: "GET Bucket Lifecycle",
+			name: "GetBucketLifecycle",
 			request: newRequest(
 				t,
 				http.MethodGet,
@@ -100,7 +100,7 @@ func generateTestCases(t *testing.T) []testCase {
 		},
 
 		{
-			name: "Get Bucket (List Objects)",
+			name: "ListObjects",
 			request: newRequest(
 				t,
 				http.MethodGet,

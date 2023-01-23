@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lvjp/raw-s3-sdk-go/session"
+	"github.com/lvjp/raw-s3-sdk-go/config"
 	"github.com/lvjp/raw-s3-sdk-go/signing/utils"
 	"golang.org/x/exp/maps"
 )
@@ -21,7 +21,7 @@ import (
 const dateFormatYYYMMDD = "20060102"
 const dateFormatISO8601 = "20060102T150405Z"
 
-func Sign(r *http.Request, credentials session.Credentials, region string) error {
+func Sign(r *http.Request, credentials config.Credentials, region string) error {
 	prepareRequest(r)
 
 	signer := &signer{
@@ -75,7 +75,7 @@ func prepareRequest(r *http.Request) {
 type signer struct {
 	// Input
 	request     *http.Request
-	credentials *session.Credentials
+	credentials *config.Credentials
 	region      string
 	queryString url.Values
 
