@@ -1,6 +1,6 @@
 package utils
 
-func UriEncode(input string) string {
+func URIEncode(input string) string {
 	const upperhex = "0123456789ABCDEF"
 
 	hexCount := 0

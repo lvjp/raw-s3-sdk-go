@@ -12,7 +12,7 @@ const (
 )
 
 type Config struct {
-	HttpClient HttpClient
+	HTTPClient HTTPClient
 
 	Region string
 
@@ -27,6 +27,6 @@ type Credentials struct {
 	SecretKey string
 }
 
-type HttpClient interface {
+type HTTPClient interface {
 	Do(*http.Request) (*http.Response, error)
 }

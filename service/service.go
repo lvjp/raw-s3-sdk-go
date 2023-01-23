@@ -11,13 +11,16 @@ import (
 	"github.com/lvjp/raw-s3-sdk-go/signing"
 )
 
+const standardHTTPPort = 80
+const standardHTTPSPort = 443
+
 type Service struct {
 	config config.Config
 }
 
 func New(config config.Config) *Service {
-	if config.HttpClient == nil {
-		config.HttpClient = http.DefaultClient
+	if config.HTTPClient == nil {
+		config.HTTPClient = http.DefaultClient
 	}
 
 	return &Service{
@@ -33,17 +36,18 @@ func (s *Service) Do(ctx context.Context, method string, bucket, key *string, qu
 		return nil, nil, err
 	}
 
-	if err := signer(req, s.config.Credentials, s.config.Region); err != nil {
+	err = signer(req, s.config.Credentials, s.config.Region)
+	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := s.config.HttpClient.Do(req)
+	resp, err := s.config.HTTPClient.Do(req)
 
 	return req, resp, err
 }
 
 func (s *Service) newRequest(ctx context.Context, method string, bucket, key *string, queryString url.Values, body io.ReadCloser) *http.Request {
-	url := s.newUrl(bucket, key, queryString)
+	url := s.newURL(bucket, key, queryString)
 
 	req := &http.Request{
 		Method:     method,
@@ -61,7 +65,7 @@ func (s *Service) newRequest(ctx context.Context, method string, bucket, key *st
 	return req.WithContext(ctx)
 }
 
-func (s *Service) newUrl(bucket *string, key *string, queryString url.Values) *url.URL {
+func (s *Service) newURL(bucket *string, key *string, queryString url.Values) *url.URL {
 	e := &s.config.Endpoint
 
 	url := &url.URL{
@@ -74,12 +78,12 @@ func (s *Service) newUrl(bucket *string, key *string, queryString url.Values) *u
 
 	if e.WithSSL {
 		url.Scheme = "https"
-		if e.Port != 443 {
+		if e.Port != standardHTTPSPort {
 			url.Host += ":" + strconv.Itoa(e.Port)
 		}
 	} else {
 		url.Scheme = "http"
-		if e.Port != 80 {
+		if e.Port != standardHTTPPort {
 			url.Host += ":" + strconv.Itoa(e.Port)
 		}
 	}

@@ -14,7 +14,7 @@ type Endpoint struct {
 	WithVirtualHost bool
 }
 
-func NewEndpointFromUrl(url string) (e Endpoint, err error) {
+func NewEndpointFromURL(url string) (e Endpoint, err error) {
 	u, err := neturl.Parse(url)
 	if err != nil {
 		err = fmt.Errorf("cannot parse testserver URL: %w", err)

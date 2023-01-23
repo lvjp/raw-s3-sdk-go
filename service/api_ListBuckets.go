@@ -12,8 +12,8 @@ import (
 type ListBucketsOutput struct {
 	Payload types.ListAllMyBucketsResult
 
-	HttpRequest  *http.Request
-	HttpResponse *http.Response
+	HTTPRequest  *http.Request
+	HTTPResponse *http.Response
 }
 
 func (c *Service) ListBuckets(ctx context.Context) (*ListBucketsOutput, error) {
@@ -30,8 +30,8 @@ func (c *Service) ListBuckets(ctx context.Context) (*ListBucketsOutput, error) {
 	}
 
 	output := &ListBucketsOutput{
-		HttpRequest:  req,
-		HttpResponse: resp,
+		HTTPRequest:  req,
+		HTTPResponse: resp,
 	}
 
 	if err := xml.Unmarshal(body, &output.Payload); err != nil {

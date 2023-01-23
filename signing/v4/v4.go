@@ -22,7 +22,9 @@ const dateFormatYYYMMDD = "20060102"
 const dateFormatISO8601 = "20060102T150405Z"
 
 func Sign(r *http.Request, credentials config.Credentials, region string) error {
-	prepareRequest(r)
+	if err := prepareRequest(r); err != nil {
+		return err
+	}
 
 	signer := &signer{
 		request:     r,
@@ -49,7 +51,7 @@ func Sign(r *http.Request, credentials config.Credentials, region string) error 
 	return nil
 }
 
-func prepareRequest(r *http.Request) {
+func prepareRequest(r *http.Request) error {
 	defaults := map[string]string{
 		"Host":       r.Host,
 		"X-Amz-Date": time.Now().UTC().Format(dateFormatISO8601),
@@ -62,7 +64,10 @@ func prepareRequest(r *http.Request) {
 	}
 
 	if r.Header.Get("X-Amz-Content-Sha256") == "" {
-		payload := readAndReplaceBody(r)
+		payload, err := readAndReplaceBody(r)
+		if err != nil {
+			return err
+		}
 		hash := fmt.Sprintf("%x", sha256.Sum256(payload))
 		r.Header.Set("X-Amz-Content-Sha256", hash)
 	}
@@ -70,6 +75,8 @@ func prepareRequest(r *http.Request) {
 	if r.URL.Path == "" {
 		r.URL.Path = "/"
 	}
+
+	return nil
 }
 
 type signer struct {
@@ -130,7 +137,7 @@ func (s *signer) computeCanonicalRequest() string {
 	return strings.Join(
 		[]string{
 			s.request.Method,
-			utils.UriEncode(s.request.URL.Path),
+			utils.URIEncode(s.request.URL.Path),
 			s.computeCanonicalQueryString(),
 			s.computeCanonicalHeaders(),
 			s.request.Header.Get("X-Amz-Content-Sha256"),
@@ -172,7 +179,7 @@ func (s *signer) computeCanonicalQueryString() string {
 	buf := strings.Builder{}
 	for _, key := range keys {
 		values := s.queryString[key]
-		keyEscaped := utils.UriEncode(key)
+		keyEscaped := utils.URIEncode(key)
 
 		for _, value := range values {
 			if buf.Len() > 0 {
@@ -180,7 +187,7 @@ func (s *signer) computeCanonicalQueryString() string {
 			}
 			buf.WriteString(keyEscaped)
 			buf.WriteByte('=')
-			buf.WriteString(utils.UriEncode(value))
+			buf.WriteString(utils.URIEncode(value))
 		}
 	}
 
@@ -190,8 +197,8 @@ func (s *signer) computeCanonicalQueryString() string {
 func (s *signer) computeCanonicalHeaders() string {
 	headers := make(map[string][]string, len(s.request.Header))
 
-	for name, values := range s.request.Header {
-		name := strings.ToLower(name)
+	for key, values := range s.request.Header {
+		name := strings.ToLower(key)
 		switch name {
 		case "host":
 			cleaned := make([]string, 0, len(values))
@@ -222,7 +229,7 @@ func (s *signer) computeCanonicalHeaders() string {
 	buf := strings.Builder{}
 	for _, key := range keys {
 		values := headers[key]
-		keyEscaped := utils.UriEncode(key)
+		keyEscaped := utils.URIEncode(key)
 
 		for _, value := range values {
 			buf.WriteString(keyEscaped)
@@ -238,12 +245,16 @@ func (s *signer) computeCanonicalHeaders() string {
 	return buf.String()
 }
 
-func readAndReplaceBody(r *http.Request) []byte {
+func readAndReplaceBody(r *http.Request) ([]byte, error) {
 	if r.Body == nil {
-		return []byte{}
+		return []byte{}, nil
 	}
 
-	payload, _ := io.ReadAll(r.Body)
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read and replace the request body: %w", err)
+	}
+
 	r.Body = io.NopCloser(bytes.NewReader(payload))
-	return payload
+	return payload, nil
 }

@@ -53,7 +53,7 @@ func TestListBucket(t *testing.T) {
 	defer ts.Close()
 
 	cfg := config.Config{
-		HttpClient: ts.Client(),
+		HTTPClient: ts.Client(),
 
 		Region: "eu-west-1",
 
@@ -66,7 +66,7 @@ func TestListBucket(t *testing.T) {
 	}
 
 	var err error
-	cfg.Endpoint, err = config.NewEndpointFromUrl(ts.URL)
+	cfg.Endpoint, err = config.NewEndpointFromURL(ts.URL)
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
