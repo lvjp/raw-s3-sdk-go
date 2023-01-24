@@ -1,6 +1,13 @@
 package config
 
-import "net/http"
+import (
+	"context"
+	"errors"
+	"net/http"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+)
 
 type SignatureType int
 
@@ -20,6 +27,30 @@ type Config struct {
 
 	Credentials   Credentials
 	SignatureType SignatureType
+}
+
+func (c Config) ToAWS() aws.Config {
+	return aws.Config{
+		Region: c.Region,
+		EndpointResolverWithOptions: aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+			if service != s3.ServiceID {
+				return aws.Endpoint{}, errors.New("unsupported service: " + service)
+			}
+
+			return aws.Endpoint{
+				URL:               c.Endpoint.String(),
+				SigningRegion:     c.Region,
+				HostnameImmutable: !c.Endpoint.WithVirtualHost,
+			}, nil
+		}),
+		Credentials: aws.CredentialsProviderFunc(func(ctx context.Context) (aws.Credentials, error) {
+			return aws.Credentials{
+				AccessKeyID:     c.Credentials.AccessKey,
+				SecretAccessKey: c.Credentials.SecretKey,
+			}, nil
+		}),
+		HTTPClient: c.HTTPClient,
+	}
 }
 
 type Credentials struct {

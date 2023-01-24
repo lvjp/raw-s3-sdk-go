@@ -2,15 +2,15 @@ package types
 
 type ListAllMyBucketsResult struct {
 	Buckets []Bucket `xml:"Buckets>Bucket"`
-	Owner   Owner
+	Owner   *Owner
 }
 
 type Bucket struct {
-	CreationDate string
-	Name         string
+	CreationDate *string
+	Name         *string
 }
 
 type Owner struct {
-	DisplayName string
-	ID          string
+	DisplayName *string
+	ID          *string
 }

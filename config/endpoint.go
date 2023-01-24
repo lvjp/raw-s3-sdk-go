@@ -14,6 +14,16 @@ type Endpoint struct {
 	WithVirtualHost bool
 }
 
+func (e Endpoint) String() string {
+	suffix := ""
+
+	if e.WithSSL {
+		suffix = "s"
+	}
+
+	return fmt.Sprintf("http%s://%s:%d", suffix, e.Host, e.Port)
+}
+
 func NewEndpointFromURL(url string) (e Endpoint, err error) {
 	u, err := neturl.Parse(url)
 	if err != nil {
