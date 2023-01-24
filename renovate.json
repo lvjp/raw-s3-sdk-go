@@ -10,7 +10,7 @@
         "golang.org/x"
       ],
       "schedule": [
-        "schedule:monthly"
+        "every month"
       ]
     }
   ]
