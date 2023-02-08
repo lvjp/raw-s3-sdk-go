@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func (lambr *ListAllMyBucketsResult) ToAWS(t *testing.T) *s3.ListBucketsOutput {
@@ -33,9 +33,7 @@ func (b *Bucket) ToAWS(t *testing.T) *types.Bucket {
 
 	if b.CreationDate != nil {
 		parsed, err := time.Parse(time.RFC3339, *b.CreationDate)
-		if !assert.NoError(t, err, "Cannot parse bucket '%v' creation date", b.Name) {
-			t.FailNow()
-		}
+		require.NoError(t, err, "Cannot parse bucket '%v' creation date", b.Name)
 		result.CreationDate = &parsed
 	}
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/lvjp/raw-s3-sdk-go/config"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHeadBucket(t *testing.T) {
@@ -32,17 +32,13 @@ func TestHeadBucket(t *testing.T) {
 
 	var err error
 	cfg.Endpoint, err = config.NewEndpointFromURL(ts.URL)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	require.NoError(t, err)
 
 	client := New(cfg)
 	bucket := "myBucket"
 
 	_, err = client.HeadBucket(context.Background(), bucket)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	require.NoError(t, err)
 
 	s3client := s3.NewFromConfig(cfg.ToAWS())
 	_, err = s3client.HeadBucket(
@@ -51,5 +47,5 @@ func TestHeadBucket(t *testing.T) {
 			Bucket: &bucket,
 		},
 	)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

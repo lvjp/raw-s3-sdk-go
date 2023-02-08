@@ -12,7 +12,7 @@ import (
 	"github.com/aws/smithy-go/middleware"
 	"github.com/lvjp/raw-s3-sdk-go/config"
 	"github.com/lvjp/raw-s3-sdk-go/types"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestListBuckets(t *testing.T) {
@@ -59,8 +59,8 @@ func TestListBuckets(t *testing.T) {
 
 		w.WriteHeader(http.StatusOK)
 		written, err := w.Write(payload)
-		assert.NoError(t, err)
-		assert.Equal(t, len(payload), written)
+		require.NoError(t, err)
+		require.Equal(t, len(payload), written)
 	}))
 	defer ts.Close()
 
@@ -79,22 +79,19 @@ func TestListBuckets(t *testing.T) {
 
 	var err error
 	cfg.Endpoint, err = config.NewEndpointFromURL(ts.URL)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	require.NoError(t, err)
 
 	client := New(cfg)
 
 	output, err := client.ListBuckets(context.Background())
-	if !assert.NoError(t, err) || !assert.Equal(t, expected, output.Payload) {
-		t.FailNow()
-	}
+	require.NoError(t, err)
+	require.Equal(t, expected, output.Payload)
 
 	s3client := s3.NewFromConfig(cfg.ToAWS())
 
 	s3out, err := s3client.ListBuckets(context.Background(), &s3.ListBucketsInput{})
-	if assert.NoError(t, err) {
-		s3out.ResultMetadata = middleware.Metadata{}
-		assert.Equal(t, output.Payload.ToAWS(t), s3out)
-	}
+	require.NoError(t, err)
+
+	s3out.ResultMetadata = middleware.Metadata{}
+	require.Equal(t, output.Payload.ToAWS(t), s3out)
 }

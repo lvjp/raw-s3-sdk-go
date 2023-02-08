@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/lvjp/raw-s3-sdk-go/config"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var creds = config.Credentials{
@@ -22,18 +22,15 @@ func TestSign(t *testing.T) {
 				tc.region,
 			)
 
-			if assert.NoError(t, err) {
-				assert.Equal(t, tc.expected, tc.request.Header.Get("Authorization"))
-			}
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, tc.request.Header.Get("Authorization"))
 		})
 	}
 }
 
 func newRequest(t *testing.T, method, url string, headers map[string]string) *http.Request {
 	r, err := http.NewRequest(method, url, nil)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	require.NoError(t, err)
 
 	for key, value := range headers {
 		r.Header.Set(key, value)
