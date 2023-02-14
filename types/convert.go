@@ -9,6 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func (lc *BucketLocationConstraint) ToAWS(t *testing.T) types.BucketLocationConstraint {
+	return types.BucketLocationConstraint(lc.LocationConstraint)
+}
+
 func (lambr *ListAllMyBucketsResult) ToAWS(t *testing.T) *s3.ListBucketsOutput {
 	result := &s3.ListBucketsOutput{}
 

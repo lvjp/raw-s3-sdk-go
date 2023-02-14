@@ -1,5 +1,9 @@
 package types
 
+type BucketLocationConstraint struct {
+	LocationConstraint string `xml:",chardata"`
+}
+
 type ListAllMyBucketsResult struct {
 	Buckets []Bucket `xml:"Buckets>Bucket"`
 	Owner   *Owner
