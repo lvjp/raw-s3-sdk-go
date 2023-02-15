@@ -10,7 +10,7 @@ import (
 )
 
 type GetBucketLocationOutput struct {
-	Payload types.BucketLocationConstraint
+	Payload types.LocationConstraint
 
 	HTTPRequest  *http.Request
 	HTTPResponse *http.Response

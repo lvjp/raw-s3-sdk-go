@@ -1,6 +1,6 @@
 package types
 
-type BucketLocationConstraint struct {
+type LocationConstraint struct {
 	LocationConstraint string `xml:",chardata"`
 }
 

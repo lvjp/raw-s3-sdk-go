@@ -3,49 +3,34 @@ package service
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/lvjp/raw-s3-sdk-go/config"
 	"github.com/stretchr/testify/require"
 )
 
 func TestHeadBucket(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	}))
+	})
+
+	ts, ourClient, awsClient := NewServer(t, handler)
 	defer ts.Close()
 
-	cfg := config.Config{
-		HTTPClient: ts.Client(),
-
-		Region: "eu-west-1",
-
-		Credentials: config.Credentials{
-			AccessKey: "DUMMYAIOSFODNN7EXAMPLE",
-			SecretKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-		},
-
-		SignatureType: config.SignatureTypeV4,
-	}
-
-	var err error
-	cfg.Endpoint, err = config.NewEndpointFromURL(ts.URL)
-	require.NoError(t, err)
-
-	client := New(cfg)
 	bucket := "myBucket"
 
-	_, err = client.HeadBucket(context.Background(), bucket)
-	require.NoError(t, err)
+	t.Run("our", func(t *testing.T) {
+		_, err := ourClient.HeadBucket(context.Background(), bucket)
+		require.NoError(t, err)
+	})
 
-	s3client := s3.NewFromConfig(cfg.ToAWS())
-	_, err = s3client.HeadBucket(
-		context.Background(),
-		&s3.HeadBucketInput{
-			Bucket: &bucket,
-		},
-	)
-	require.NoError(t, err)
+	t.Run("aws", func(t *testing.T) {
+		_, err := awsClient.HeadBucket(
+			context.Background(),
+			&s3.HeadBucketInput{
+				Bucket: &bucket,
+			},
+		)
+		require.NoError(t, err)
+	})
 }

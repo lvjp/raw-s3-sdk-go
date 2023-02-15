@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (lc *BucketLocationConstraint) ToAWS(t *testing.T) types.BucketLocationConstraint {
+func (lc *LocationConstraint) ToAWS(t *testing.T) types.BucketLocationConstraint {
 	return types.BucketLocationConstraint(lc.LocationConstraint)
 }
 
