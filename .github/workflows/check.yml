@@ -16,7 +16,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.4.0
         with:
-          version: v1.50.1
+          version: v1.51.1
       - uses: github/super-linter@v4.10.1
         env:
           DEFAULT_BRANCH: main
