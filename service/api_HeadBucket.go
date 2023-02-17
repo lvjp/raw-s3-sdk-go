@@ -14,18 +14,14 @@ type HeadBucketOutput struct {
 	HTTPResponse *http.Response
 }
 
-func (c *Service) HeadBucket(ctx context.Context, bucket string) (*HeadBucketOutput, error) {
-	req, resp, err := c.Do(ctx, http.MethodHead, &bucket, nil, nil, nil)
+func (s *Service) HeadBucket(ctx context.Context, bucket string) (*HeadBucketOutput, error) {
+	output := HeadBucketOutput{}
+	var err error
+
+	output.HTTPRequest, output.HTTPResponse, err = s.doCall(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	output := &HeadBucketOutput{
-		HTTPRequest:  req,
-		HTTPResponse: resp,
-	}
-
-	return output, nil
+	return &output, nil
 }

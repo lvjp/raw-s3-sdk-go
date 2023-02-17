@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/xml"
 	"io"
 	"net/http"
 	"net/url"
@@ -89,4 +90,26 @@ func (s *Service) newURL(bucket *string, key *string, queryString url.Values) *u
 	}
 
 	return url
+}
+
+func (s *Service) doCall(ctx context.Context, respBody any) (*http.Request, *http.Response, error) {
+	req, resp, err := s.Do(ctx, http.MethodGet, nil, nil, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if respBody != nil {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if err := xml.Unmarshal(body, respBody); err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return req, resp, nil
 }

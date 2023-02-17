@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/xml"
-	"io"
 	"net/http"
 
 	"github.com/lvjp/raw-s3-sdk-go/types"
@@ -16,27 +14,14 @@ type ListBucketsOutput struct {
 	HTTPResponse *http.Response
 }
 
-func (c *Service) ListBuckets(ctx context.Context) (*ListBucketsOutput, error) {
-	req, resp, err := c.Do(ctx, http.MethodGet, nil, nil, nil, nil)
+func (s *Service) ListBuckets(ctx context.Context) (*ListBucketsOutput, error) {
+	output := ListBucketsOutput{}
+	var err error
+
+	output.HTTPRequest, output.HTTPResponse, err = s.doCall(ctx, &output.Payload)
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	output := &ListBucketsOutput{
-		HTTPRequest:  req,
-		HTTPResponse: resp,
-	}
-
-	if err := xml.Unmarshal(body, &output.Payload); err != nil {
-		return nil, err
-	}
-
-	return output, nil
+	return &output, nil
 }
