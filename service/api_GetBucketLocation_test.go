@@ -30,6 +30,6 @@ func TestGetBucketLocation(t *testing.T) {
 		require.NoError(t, err)
 
 		s3out.ResultMetadata = middleware.Metadata{}
-		require.Equal(t, expected.ToAWS(t), s3out.LocationConstraint)
+		require.Equal(t, expected.ToAWS(t), &s3out.LocationConstraint)
 	})
 }

@@ -9,8 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (lc *LocationConstraint) ToAWS(t *testing.T) types.BucketLocationConstraint {
-	return types.BucketLocationConstraint(lc.LocationConstraint)
+var _ AWSConvertible[s3.ListBucketsOutput] = (*ListAllMyBucketsResult)(nil)
+
+type ListAllMyBucketsResult struct {
+	Buckets []Bucket `xml:"Buckets>Bucket"`
+	Owner   *Owner
+}
+
+type Bucket struct {
+	CreationDate *string
+	Name         *string
+}
+
+type Owner struct {
+	DisplayName *string
+	ID          *string
 }
 
 func (lambr *ListAllMyBucketsResult) ToAWS(t *testing.T) *s3.ListBucketsOutput {
