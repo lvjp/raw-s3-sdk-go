@@ -16,12 +16,15 @@ type HeadBucketOutput struct {
 
 func (s *Service) HeadBucket(ctx context.Context, bucket string) (*HeadBucketOutput, error) {
 	output := HeadBucketOutput{}
-	var err error
 
-	output.HTTPRequest, output.HTTPResponse, err = s.doCall(ctx, nil)
+	req, res, err := s.doCall(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
+
+	output.HTTPRequest = req
+	output.HTTPResponse = res
 
 	return &output, nil
 }

@@ -16,12 +16,15 @@ type GetBucketLocationOutput struct {
 
 func (s *Service) GetBucketLocation(ctx context.Context, bucket string) (*GetBucketLocationOutput, error) {
 	output := GetBucketLocationOutput{}
-	var err error
 
-	output.HTTPRequest, output.HTTPResponse, err = s.doCall(ctx, &output.Payload)
+	req, res, err := s.doCall(ctx, &output.Payload)
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
+
+	output.HTTPRequest = req
+	output.HTTPResponse = res
 
 	return &output, nil
 }
